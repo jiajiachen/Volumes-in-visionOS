@@ -10,14 +10,47 @@ import RealityKit
 import RealityKitContent
 
 struct ContentView: View {
+    
+    @Environment(\.openWindow) private var openWindow
+    @State private var selectedCreature: SeaCreature?
+    
+    private var SeaCreatures = [
+        SeaCreature(name: "Clam", modelName: "ClamScene"),
+        SeaCreature(name: "Fish", modelName: "FishScene"),
+        SeaCreature(name: "Slug", modelName: "SlugScene"),
+        SeaCreature(name: "Starfish", modelName: "StarfishScene")
+    ]
+    
     var body: some View {
-        VStack {
-            Model3D(named: "Scene", bundle: realityKitContentBundle)
-                .padding(.bottom, 50)
+        NavigationSplitView {
+            List(SeaCreatures) { creature in
+                Button {
+                    selectedCreature = creature
+                } label: {
+                    Text(creature.name)
+                }
 
-            Text("Hello, world!")
+            }
+            .navigationTitle("Sea Creatures")
+        } detail: {
+            if let selectedCreature {
+                Model3D(named: selectedCreature.modelName, bundle: realityKitContentBundle)
+                    .navigationTitle(selectedCreature.name)
+                    .toolbar {
+                        Button {
+                            openWindow(id: "creatureWindow", value: selectedCreature.modelName)
+                        } label: {
+                            Text("View \(selectedCreature.name)")
+                        }
+
+                    }
+                
+            } else {
+                Text("Select a sea creature")
+            }
         }
-        .padding()
+        .frame(minWidth: 700, minHeight: 700)
+
     }
 }
 
